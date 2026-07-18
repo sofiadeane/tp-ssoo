@@ -1,20 +1,37 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { QUIZZES } from '../content/quizzes.js'
 import { Icon } from './icons.jsx'
 import Card from './Card.jsx'
+import { richText } from '../lib/richText.jsx'
+
+// Fisher-Yates. El orden de las opciones en quizzes.js no es aleatorio (viene
+// del banco original de la cátedra), y en varias preguntas la correcta cae
+// siempre en la misma posición — barajarlas en el cliente evita que se pueda
+// "adivinar por patrón" en vez de por conocimiento.
+function shuffle(array) {
+  const result = [...array]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
 
 function QuizQuestion({ index, question }) {
   const [selected, setSelected] = useState(null)
   const answered = selected !== null
+  // Se baraja una sola vez por pregunta montada (no en cada render, para que
+  // no "salte" el orden al elegir una respuesta).
+  const options = useMemo(() => shuffle(question.options), [question])
 
   return (
     <Card className="space-y-4">
       <p className="font-semibold text-text leading-snug">
-        <span className="text-accent-purple-light">{index + 1}.</span> {question.question}
+        <span className="text-accent-purple-light">{index + 1}.</span> {richText(question.question)}
       </p>
 
       <div className="space-y-2.5">
-        {question.options.map((opt, i) => {
+        {options.map((opt, i) => {
           const isSelected = selected === i
           const showState = answered
           const stateClasses = !showState
@@ -43,13 +60,13 @@ function QuizQuestion({ index, question }) {
                   />
                 )}
                 <span className={showState && !opt.correct && !isSelected ? 'text-muted' : 'text-text'}>
-                  {opt.text}
+                  {richText(opt.text)}
                 </span>
               </button>
 
               {showState && (isSelected || opt.correct) && (
                 <p className="text-xs text-muted leading-relaxed mt-1.5 ml-4 pl-3 border-l-2 border-border">
-                  {opt.explanation}
+                  {richText(opt.explanation)}
                 </p>
               )}
             </div>

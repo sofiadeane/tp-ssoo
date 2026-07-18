@@ -33,3 +33,13 @@ body {
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid #2D323C;
 }
+
+/* Selección de texto con el verde neón de la paleta, no el azul por defecto */
+::selection {
+  background-color: #A6F684;
+  color: #000000;
+}
+::-moz-selection {
+  background-color: #A6F684;
+  color: #000000;
+}

@@ -1,4 +1,5 @@
 import Callout from './Callout.jsx'
+import { richText } from '../lib/richText.jsx'
 
 // Renderiza un bloque de contenido pedagógico. Los datos de cada módulo
 // (content/pages/*.js) son arrays de objetos { type, ... } — este es el
@@ -6,16 +7,21 @@ import Callout from './Callout.jsx'
 // nuevo, agregalo acá una sola vez y todos los módulos pueden usarlo.
 //
 // Tipos soportados: p, ul, ol, code, callout, table.
-export default function ContentBlock({ block }) {
+// Todo texto (menos `code`, que se muestra literal) pasa por richText() para
+// soportar **negrita**, `código`, {{g:...}} (glosa) y {{f:...}} (nota al pie)
+// — ver src/lib/richText.jsx.
+export default function ContentBlock({ block, footnoteNumbers }) {
+  const rt = (text) => richText(text, footnoteNumbers)
+
   switch (block.type) {
     case 'p':
-      return <p className="text-muted leading-relaxed">{block.text}</p>
+      return <p className="text-muted leading-relaxed">{rt(block.text)}</p>
 
     case 'ul':
       return (
         <ul className="list-disc list-outside pl-5 space-y-1.5 text-muted leading-relaxed">
           {block.items.map((item, i) => (
-            <li key={i}>{item}</li>
+            <li key={i}>{rt(item)}</li>
           ))}
         </ul>
       )
@@ -24,7 +30,7 @@ export default function ContentBlock({ block }) {
       return (
         <ol className="list-decimal list-outside pl-5 space-y-1.5 text-muted leading-relaxed">
           {block.items.map((item, i) => (
-            <li key={i}>{item}</li>
+            <li key={i}>{rt(item)}</li>
           ))}
         </ol>
       )
@@ -38,8 +44,8 @@ export default function ContentBlock({ block }) {
 
     case 'callout':
       return (
-        <Callout tone={block.tone || 'info'} title={block.title}>
-          {block.text}
+        <Callout tone={block.tone || 'info'} title={block.title && rt(block.title)}>
+          {rt(block.text)}
         </Callout>
       )
 
@@ -51,7 +57,7 @@ export default function ContentBlock({ block }) {
               <tr className="bg-panel">
                 {block.headers.map((h, i) => (
                   <th key={i} className="px-4 py-2.5 font-semibold text-text border-b border-border">
-                    {h}
+                    {rt(h)}
                   </th>
                 ))}
               </tr>
@@ -61,7 +67,7 @@ export default function ContentBlock({ block }) {
                 <tr key={ri} className="border-b border-border last:border-0 odd:bg-white/[0.02]">
                   {row.map((cell, ci) => (
                     <td key={ci} className="px-4 py-2.5 text-muted align-top">
-                      {cell}
+                      {rt(cell)}
                     </td>
                   ))}
                 </tr>

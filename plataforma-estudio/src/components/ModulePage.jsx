@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams, useSearchParams, Navigate, Link } from 'react-router-dom'
 import { getModule } from '../content/modules.js'
 import { PAGES } from '../content/pages/index.js'
@@ -8,6 +8,8 @@ import Quiz from './Quiz.jsx'
 import Callout from './Callout.jsx'
 import Card from './Card.jsx'
 import { Icon } from './icons.jsx'
+import { collectFootnotes } from '../lib/footnotes.js'
+import { richText } from '../lib/richText.jsx'
 
 // Orden fijo del flujo pedagógico pedido: Intro → Conceptos → Cómo funciona
 // → Flujo paso a paso → Detalles → Errores comunes → Resumen. Una sección se
@@ -37,6 +39,8 @@ export default function ModulePage() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [searchParams, moduleId])
 
+  const { list: footnotes, numberOf } = useMemo(() => collectFootnotes(page || {}), [page])
+
   if (!mod || !page) return <Navigate to="/" replace />
 
   return (
@@ -57,12 +61,31 @@ export default function ModulePage() {
             </h2>
             <div className="space-y-3">
               {blocks.map((block, i) => (
-                <ContentBlock key={i} block={block} />
+                <ContentBlock key={i} block={block} footnoteNumbers={numberOf} />
               ))}
             </div>
           </section>
         )
       })}
+
+      {footnotes.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-xl font-bold text-text flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-muted" />
+            Notas al pie
+          </h2>
+          <ol className="space-y-2 text-sm text-muted list-decimal list-outside pl-5">
+            {footnotes.map((note, i) => (
+              <li key={i} id={`fn-${i + 1}`}>
+                {richText(note)}{' '}
+                <a href={`#fnref-${i + 1}`} className="text-accent-purple-light no-underline hover:underline">
+                  ↩
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
       <section className="space-y-3">
         <h2 className="text-xl font-bold text-text flex items-center gap-2">
