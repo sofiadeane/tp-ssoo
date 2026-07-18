@@ -27,7 +27,7 @@ export default {
       rows: [
         [
           'Sofía Deane (sofiadeane)',
-          'Integradora del equipo: mayoría de los commits totales, tocó casi todos los módulos en la etapa de estabilización. Compactación de memoria en kernel_memory, deadlock de mutex por herencia de prioridad, bug de EINTR en esperas de semáforo/sleep, bugs de comunicación scheduler↔io↔memstick, y coescribió el módulo CPU inicial junto con Rominna Aquino.',
+          'Casi todos los módulos en la etapa de estabilización. Compactación de memoria en kernel_memory, deadlock de mutex por herencia de prioridad, bug de EINTR en esperas de semáforo/sleep, bugs de comunicación scheduler↔io↔memstick, y coescribió el módulo CPU inicial junto con Rominna Aquino.',
         ],
         [
           'Priscila Zárate (priscilazarate)',
